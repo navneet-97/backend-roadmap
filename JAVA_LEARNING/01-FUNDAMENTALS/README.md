@@ -20,3 +20,11 @@ Before going deep into Java, build a strong understanding of these core programm
 
 Notes link: [link](https://cdn.codewithmosh.com/image/upload/v1702943783/cheat-sheets/java.pdf)
 Video link: [link](https://www.youtube.com/watch?v=eIrMbAQSU34)
+
+## Project
+
+### CLI Library Management System
+
+> Build a command-line library system to manage books and members, and handle borrowing and returning books.
+
+**Features:** Add Book · Remove Book · Search Book · Register Member · Borrow Book · Return Book · Show Borrowed Books · Show Available Books
