@@ -731,6 +731,66 @@ String name = scanner.nextLine();
 
 Avoid closing a `Scanner` that wraps `System.in` unless the program is ending, because closing it also closes standard input.
 
+### Scanner gotcha: `nextInt()` + `nextLine()`
+
+When you use `nextInt()` followed by `nextLine()`, `nextLine()` may appear to skip input:
+
+```java
+int age = scanner.nextInt();
+String name = scanner.nextLine(); // skips input
+```
+
+`nextInt()` reads only the integer token and leaves the newline (`\n`) in the buffer. Then `nextLine()` immediately consumes that leftover newline and returns an empty string.
+
+If the user enters:
+
+```text
+25⏎
+```
+
+`nextInt()` reads only `25` and leaves the newline (`\n`) behind.
+
+Then `nextLine()` immediately consumes that leftover newline and returns an empty string.
+
+## Why?
+
+Think of the input as:
+
+```text
+25\n
+```
+
+After `nextInt()`:
+
+```text
+25\n
+  ↑
+  newline is still here
+```
+
+Then `nextLine()` sees the newline immediately and returns:
+
+```text
+""
+```
+
+**Fix:** Consume the leftover newline before reading the next line:
+
+```java
+int age = scanner.nextInt();
+scanner.nextLine(); // consume leftover newline
+String name = scanner.nextLine(); // waits for actual input
+```
+
+**Alternative:** Read everything with `nextLine()` and parse as needed:
+
+```java
+int age = Integer.parseInt(scanner.nextLine());
+double price = Double.parseDouble(scanner.nextLine());
+```
+
+This avoids the issue entirely because every read consumes a full line.
+
 ## 16. Basic time and space complexity
 
 **Time complexity** describes how the amount of work grows as input size `n` grows. **Space complexity** describes how much additional memory an algorithm uses. Big-O notation describes an upper-bound growth rate; it ignores constants and lower-order terms.
@@ -765,7 +825,30 @@ static void printPairs(int[] values) {
 
 Sequential loops are added, not multiplied: two separate `O(n)` loops are `O(2n)`, simplified to `O(n)`. Nested loops multiply only when each runs broadly for each iteration of the other. Complexity is a guide to scalability, not a substitute for measuring a real program.
 
-## 17. Practical checklist
+## 17. When to use what
+
+A quick practical reference for where Java fundamentals appear in real backend development.
+
+| Concept | When / Where to Use |
+|---|---|
+| Variables & Data Types | Represent IDs, quantities, status, flags, prices, dates, etc. |
+| Primitive vs Reference Types | Choosing nullable/non-nullable values, memory-sensitive code, collections |
+| `==` vs `.equals()` | `==` for primitives/identity; `.equals()` for value comparison |
+| References | Working with objects, collections, entity relationships, caching |
+| Pass-by-Value | Understanding method behavior and debugging unexpected object changes |
+| Stack vs Heap | Debugging recursion, memory issues, `StackOverflowError`, `OutOfMemoryError` |
+| Scope | Controlling where variables can be accessed; methods, loops, classes |
+| Mutability vs Immutability | DTOs, value objects, configuration, thread-safe code |
+| Methods | Business logic, service operations, utility functions, API operations |
+| Recursion | Trees, nested structures, file systems, graphs, parsing |
+| Exceptions | Handling failures, validation errors, business exceptions, database errors |
+| `null` | Optional database/request values and handling missing data safely |
+| Arrays | Binary data, fixed-size data, low-level processing, algorithms |
+| Strings | User input, JSON, URLs, headers, JWTs, logs, messages |
+| Collections | Storing and processing groups of objects |
+| Big-O | Choosing data structures and avoiding performance problems as data grows |
+
+## 18. Practical checklist
 
 - Use `int` for ordinary whole numbers; use `long` when its range is needed.
 - Use `double` for general decimal calculations and understand its precision limits.

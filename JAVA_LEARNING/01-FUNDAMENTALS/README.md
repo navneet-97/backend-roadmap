@@ -1,115 +1,47 @@
 # Programming Fundamentals
 
-Before going deep into Java, build a strong understanding of these core programming fundamentals.
+A structured learning repository for core programming fundamentals in Java, covering topics from variables and data types to memory models and complexity analysis. Includes comprehensive notes and a hands-on CLI project to practice what you learn.
 
-## Topics To Learn
+## Topics Covered
 
-1. [ ] Variables and Data Types
-2. [ ] Operators
-3. [ ] Conditions
-4. [ ] Loops
-5. [ ] Functions / Methods
-6. [ ] Recursion
-7. [ ] Scope
-8. [ ] Mutability vs Immutability
-9. [ ] Pass-by-Value
-10. [ ] Stack vs Heap
-11. [ ] References
-12. [ ] Error Handling
-13. [ ] Basic Complexity Analysis
+1. Variables and Data Types
+2. Operators and Arithmetic
+3. Conditions and Switch Expressions
+4. Loops and Iteration
+5. Functions / Methods
+6. Recursion
+7. Scope and Lifetime
+8. Mutability vs Immutability
+9. Pass-by-Value
+10. Stack vs Heap Memory
+11. References and Aliasing
+12. Error Handling (Exceptions)
+13. Basic Complexity Analysis (Big-O)
 
-Notes link: [link](https://cdn.codewithmosh.com/image/upload/v1702943783/cheat-sheets/java.pdf)
-Video link: [link](https://www.youtube.com/watch?v=eIrMbAQSU34)
+See [`java-fundamentals.md`](java-fundamentals.md) for detailed explanations, code examples, and a practical checklist.
 
-## Project
+## CLI Library Management System
 
-### CLI Library Management System
+A command-line application to manage a small library of books and members. Built as a practice project to apply core Java fundamentals.
 
-> Build a command-line library system to manage books and members, and handle borrowing and returning books.
+### Features
 
-**Features:** Add Book · Remove Book · Search Book · Register Member · Borrow Book · Return Book · Show Borrowed Books · Show Available Books
+- Add and remove books (admin only)
+- Search for books by name
+- Register new members
+- Borrow and return books
+- View borrowed books (admin only)
+- View available books
 
+### How to Run
 
-Important Point:
-1. # Java Scanner: `nextInt()` + `nextLine()` Issue
-
-## The Problem
-
-When you use `nextInt()` followed by `nextLine()`, `nextLine()` may appear to skip input.
-
-```java
-int age = scanner.nextInt();
-String name = scanner.nextLine();
+```bash
+cd CLI_Library_Mangement_System
+javac Main.java Book.java Member.java
+java Main
 ```
 
-If the user enters:
+## Resources
 
-```text
-25⏎
-```
-
-`nextInt()` reads only `25` and leaves the newline (`\n`) behind.
-
-Then `nextLine()` immediately consumes that leftover newline and returns an empty string.
-
-## Why?
-
-Think of the input as:
-
-```text
-25\n
-```
-
-After `nextInt()`:
-
-```text
-25\n
-  ↑
-  newline is still here
-```
-
-Then `nextLine()` sees the newline immediately and returns:
-
-```text
-""
-```
-
-## Fix
-
-Consume the leftover newline before reading the next line:
-
-```java
-int age = scanner.nextInt();
-scanner.nextLine();
-
-String name = scanner.nextLine();
-```
-
-The first `nextLine()` consumes the leftover newline.
-The second `nextLine()` waits for the user's actual input.
-
-## Important Difference
-
-| Method         | Reads         |
-| -------------- | ------------- |
-| `nextInt()`    | Integer token |
-| `nextDouble()` | Double token  |
-| `next()`       | One token     |
-| `nextLine()`   | Entire line   |
-
-### Best Mental Model
-
-`nextInt()` and `next()` are **token-based**.
-
-`nextLine()` is **line-based**.
-
-> `nextLine()` reads from the current cursor position until it reaches a newline.
-
-## Alternative
-
-To avoid this issue completely, you can read everything with `nextLine()` and convert when needed:
-
-```java
-int age = Integer.parseInt(scanner.nextLine());
-double price = Double.parseDouble(scanner.nextLine());
-```
+- [Java Cheat Sheet (PDF)](https://cdn.codewithmosh.com/image/upload/v1702943783/cheat-sheets/java.pdf)
+- [Java Fundamentals Video](https://www.youtube.com/watch?v=eIrMbAQSU34)
