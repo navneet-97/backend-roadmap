@@ -4,7 +4,7 @@ public class Main {
     static final HashMap<String, Book> books = new HashMap<>();
     static final HashMap<Integer, String> input = new HashMap<>();
     static final HashMap<String, Member> members = new HashMap<>();
-    static final HashMap<String, Book> borrowedBooks = new HashMap<>();
+    static final HashMap<String, List<Book>> borrowedBooks = new HashMap<>();
 
     static final Scanner sc = new Scanner(System.in);
 
@@ -145,7 +145,9 @@ public class Main {
 
             if (book.quantity > 0) {
                 Book newBook = new Book(book.name, book.price, book.auther, book.quantity - 1);
-                borrowedBooks.put(userName, newBook);
+                List<Book> list = borrowedBooks.getOrDefault(userName, new ArrayList<>());
+                list.add(newBook);
+                
                 books.put(bookName, newBook);
             } else {
                 return "Not available right now, try later!";
@@ -156,7 +158,6 @@ public class Main {
         return "Happy reading!";
     }
 
-    // bugs
     public static String returnBook() {
         String userName = checkMemberExistOrNot();
         if (userName.isEmpty()) {
@@ -172,8 +173,8 @@ public class Main {
         }
 
         Book book = books.get(bookName);
-        // remove only the one user is returing , a single user can have borrowed multiple books
-        borrowedBooks.remove(userName);
+        List<Book> borrowedBookList = borrowedBooks.get(userName);
+        borrowedBookList.remove(book);
         books.put(bookName, new Book(book.name, book.price, book.auther, book.quantity + 1));
 
         return "Thanks for returning on time!";
@@ -185,9 +186,10 @@ public class Main {
         }
 
         for (String user : borrowedBooks.keySet()) {
-            Book book = borrowedBooks.get(user);
-
-            System.out.println(book.name + " by " + book.auther + ": " + user);
+            List<Book> books = borrowedBooks.get(user);
+            for (Book book : books) {
+                System.out.println(book.name + " by " + book.auther + ": " + user);
+            }
         }
         return "All borrowed books are listed above";
     }
@@ -207,7 +209,7 @@ public class Main {
         seedUsers();
 
         System.out.println("Hi, welcome to our library!");
-        System.out.print("Enter 0 to see our services or 9 to exit: ");
+        System.out.print("Enter 0 to see our services: ");
         int commandNo = sc.nextInt();
 
         while (commandNo == 0) {
@@ -241,7 +243,7 @@ public class Main {
             }
 
             System.out.println();
-            System.out.println("Enter 0 to see our services, 9 to exit");
+            System.out.print("Enter 0 to see our services again: ");
             commandNo = sc.nextInt();
         }
     }
