@@ -79,3 +79,198 @@ Human h = new Human();
 ### Why Do Classes Exist?
 
 Because we don't want our program to be a giant collection of unrelated variables and functions. Classes group related **state** (fields) and **behavior** (methods) together.
+
+---
+
+## 3. Constructors
+
+A **constructor** is a special method that runs when you create an object. It initializes the object into a valid state.
+
+### How Object Creation Works
+
+```java
+BankAccount account = new BankAccount("ACC001", "user", 5000);
+```
+
+```
+new BankAccount(...)
+       ↓
+Java allocates memory for the object
+       ↓
+Fields initially receive default values
+       ↓
+Constructor executes
+       ↓
+Constructor initializes the object
+       ↓
+Reference returned
+       ↓
+account points to the object
+```
+
+`new` creates the object; the constructor initializes it.
+
+### Basic Constructor
+
+```java
+public class BankAccount {
+
+    private String accountNumber;
+    private String ownerName;
+    private BigDecimal balance;
+
+    public BankAccount(String accountNumber, String ownerName, BigDecimal balance) {
+        this.accountNumber = accountNumber;
+        this.ownerName = ownerName;
+        this.balance = balance;
+    }
+}
+```
+
+`this` refers to the current object. `this.accountNumber = accountNumber` distinguishes the field from the parameter.
+
+### What is an Invariant?
+
+An **invariant** is a condition that should always be true for an object. For a bank account: `balance >= 0`.
+
+```java
+public BankAccount(BigDecimal initialBalance) {
+    if (initialBalance.compareTo(BigDecimal.ZERO) < 0) {
+        throw new IllegalArgumentException("Initial balance cannot be negative");
+    }
+    this.balance = initialBalance;
+}
+
+public void withdraw(BigDecimal amount) {
+    if (amount.compareTo(balance) > 0) {
+        throw new IllegalArgumentException("Insufficient balance");
+    }
+    balance = balance.subtract(amount);
+}
+```
+
+Both creation and behavior protect the invariant. The object controls how its state changes.
+
+### Constructor Types
+
+#### 1. No-Argument Constructor
+
+```java
+public BankAccount() {
+}
+```
+
+If you don't write any constructor, Java provides a default no-argument constructor automatically.
+
+**Rule**: Once you define any constructor yourself, Java no longer provides the default no-argument constructor. If you need one, write it explicitly.
+
+```java
+public class User {
+    private String name;
+
+    public User(String name) {
+        this.name = name;
+    }
+}
+
+// This won't compile:
+// User user = new User();  // No default constructor
+```
+
+#### 2. Constructor Overloading
+
+Multiple constructors with different parameter lists:
+
+```java
+public class User {
+    private String name;
+    private String email;
+
+    public User(String name) {
+        this.name = name;
+    }
+
+    public User(String name, String email) {
+        this.name = name;
+        this.email = email;
+    }
+}
+```
+
+```java
+User user1 = new User("user");
+User user2 = new User("User", "user@example.com");
+```
+
+**Don't abuse constructor overloading.** Too many constructors create the **telescoping constructor problem**:
+
+```java
+// Don't do this:
+User(String name)
+User(String name, String email)
+User(String name, String email, int age)
+User(String name, String email, int age, String city)
+User(String name, String email, int age, String city, String phone)
+```
+
+This becomes ugly. You now have a class with many ways to construct it, and it's difficult to know which combination represents a valid object.
+This is called telescoping constructor problem. In larger applications, alternatives such as builders, factories can be better.
+
+#### 3. Constructor Chaining
+
+One constructor can call another to avoid duplicating initialization logic:
+
+```java
+public class User {
+    private String name;
+    private String email;
+
+    public User(String name) {
+        this(name, "user@example.com");  // calls the other constructor
+    }
+
+    public User(String name, String email) {
+        this.name = name;
+        this.email = email;
+    }
+}
+```
+
+### `this()` vs `super()`
+
+| | `this(...)` | `super(...)` |
+|---|---|---|
+| Calls | Another constructor in the same class | A constructor in the parent class |
+| Must be | First statement in the constructor | First statement in the constructor |
+
+You **cannot** use both in the same constructor:
+
+```java
+Dog() {
+    this("");      // can't have both
+    super("");     // only one constructor chain
+}
+```
+Bcoz a constructor can have only one constructor chain leading upward. If this() calls another constructor in the same class, that constructor will eventually call super(). And we don't need 2 independent paths.
+
+### Constructor Restrictions
+
+A constructor:
+- Has the same name as the class
+- Has no return type
+- Can be overloaded
+- Can have access modifiers
+- Isn't inherited
+- Can call another constructor using `this(...)`
+- Can call the parent constructor using `super(...)`
+- Cannot be `abstract`, `static`, or `final`
+
+### Private Constructors
+
+```java
+public class User {
+    private User() {}
+}
+```
+
+Nobody outside the class can create objects. Used in utility classes to prevent meaningless instances, and in design patterns like Singleton and Factory.
