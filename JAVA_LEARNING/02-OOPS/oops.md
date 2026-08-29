@@ -1079,3 +1079,45 @@ abstract class ReportGenerator {
 class Bird extends Animal implements Flyable {}
 // Bird IS-A Animal and has capability of Flyable
 ```
+
+---
+
+## 10. Composition vs Inheritance
+
+| | Inheritance | Composition |
+|---|---|---|
+| Relationship | IS-A | HAS-A |
+| Coupling | Tight | Loose |
+| Flexibility | Lower | Higher |
+| Example | `class Dog extends Animal` | `class Car { private Engine engine; }` |
+
+```java
+class Engine {
+    void start() {}
+}
+
+class Car {
+    private Engine engine;
+
+    Car() {
+        this.engine = new Engine();  // Car creates its own Engine
+    }
+}
+```
+
+### When to Choose Which
+
+**Ask**: Is the child genuinely a specialized form of the parent, or does it simply need the parent's functionality?
+
+- **Inheritance** when: genuine IS-A, runtime polymorphism needed, meaningful shared behavior
+- **Composition** when: object needs another object to do part of its job, more flexibility needed
+
+Inheritance is tightly coupled — the child depends on the parent's implementation. A small change in the parent can have consequences for all subclasses.
+
+**Prefer composition when both approaches could work** because it gives you more flexibility and less coupling. With composition you can swap out components:
+
+```java
+class OrderService {
+    private PaymentGateway paymentGateway;  // can be any implementation
+}
+```
