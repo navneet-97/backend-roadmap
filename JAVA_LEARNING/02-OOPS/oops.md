@@ -943,3 +943,139 @@ interface Calculator {
 ```java
 Calculator add = (a, b) -> a + b;
 ```
+
+---
+
+## 9. Abstract Classes
+
+An **abstract class** is a class that cannot be instantiated directly and is meant to be used as a base class.
+
+```java
+abstract class Animal {
+    abstract void makeSound();
+}
+```
+
+You cannot do `new Animal()`, but you can do `Animal animal = new Dog()`.
+
+### Why Do Abstract Classes Exist?
+
+Several classes share common characteristics and behavior. You put shared logic in an abstract class and let subclasses fill in the rest.
+
+```java
+abstract class Animal {
+    protected String name;
+
+    void eat() {
+        System.out.println("Eating");
+    }
+
+    abstract void makeSound();
+}
+
+class Dog extends Animal {
+    Dog(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public void makeSound() {
+        System.out.println("Woof");
+    }
+}
+```
+
+### What Abstract Classes Can Contain
+
+| Feature | Can it be in an abstract class? |
+|---|---|
+| Abstract methods | Yes |
+| Concrete methods | Yes |
+| Instance fields | Yes |
+| Constructors | Yes |
+| Access modifiers | Yes |
+
+### Abstract Classes Have Constructors
+
+You can't instantiate an abstract class, but its constructor runs when a subclass is created:
+
+```java
+abstract class Animal {
+    protected String name;
+
+    Animal(String name) {
+        this.name = name;
+    }
+
+    abstract void makeSound();
+}
+
+class Dog extends Animal {
+    Dog(String name) {
+        super(name);  // Animal's constructor initializes the parent portion
+    }
+}
+```
+
+```java
+Dog dog = new Dog("Rex");
+```
+
+This object contains the `Animal` portion as well. That's why the abstract class needs a constructor.
+
+### Abstract Classes Don't Need Abstract Methods
+
+```java
+abstract class Animal {
+    public void makeSound() {
+        System.out.println("Some sound");
+    }
+}
+```
+
+No abstract methods, but the class is still abstract. You may want to prevent direct instantiation while providing shared implementation.
+
+### What Abstract Methods Cannot Be
+
+| Modifier | Why |
+|---|---|
+| `private` | Must be overridden by subclass |
+| `final` | Final methods can't be overridden |
+| `static` | Static methods belong to the class, not objects; can't be dynamically overridden |
+
+### Template Method Pattern
+
+Abstract classes can define common structure while requiring subclasses to fill in specific steps:
+
+```java
+abstract class ReportGenerator {
+
+    public final void generate() {
+        fetchData();
+        formatData();
+        export();
+    }
+
+    protected abstract void fetchData();
+    protected abstract void formatData();
+    protected abstract void export();
+}
+```
+
+### Abstract Class vs Interface
+
+| Feature | Abstract Class | Interface |
+|---|---|---|
+| Declared with | `abstract class` | `interface` |
+| Class uses | `extends` | `implements` |
+| Instance fields | Yes | No (only `public static final`) |
+| Constructors | Yes | No |
+| Concrete methods | Yes | Default/static/private methods only |
+| Abstract methods | Yes | Yes |
+| Multiple inheritance | One class only | Multiple interfaces |
+| Represents | Base class / type hierarchy | Contract / capability |
+
+```java
+class Bird extends Animal implements Flyable {}
+// Bird IS-A Animal and has capability of Flyable
+```
