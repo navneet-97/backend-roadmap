@@ -1334,3 +1334,53 @@ class OrderService {
 ```
 
 Spring Boot uses this idea heavily.
+
+---
+
+## 13. Cohesion
+
+**Cohesion** is the degree to which the responsibilities inside a class or module belong together. Does this class have one clear purpose?
+
+### High Cohesion
+
+```java
+class UserService {
+    void createUser() {}
+    void updateUser() {}
+    void deleteUser() {}
+}
+```
+
+All methods are related to user management.
+
+### Low Cohesion
+
+```java
+class UserService {
+    void createUser() {}
+    void sendEmail() {}
+    void generateInvoice() {}
+    void resizeImage() {}
+    void connectToDatabase() {}
+    void generatePdf() {}
+}
+```
+
+Unrelated responsibilities piled into one class.
+
+### Functional Cohesion
+
+All elements contribute toward one well-defined task:
+
+```java
+class PasswordHasher {
+    String hash(String password) { /* hashing */ }
+    boolean matches(String password, String hash) { /* verification */ }
+}
+```
+
+Both methods are strongly related to password hashing. High functional cohesion.
+
+### The Goal
+
+**High cohesion + low coupling** = easier to maintain, test, and extend.
