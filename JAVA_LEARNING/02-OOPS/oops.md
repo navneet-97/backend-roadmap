@@ -1121,3 +1121,101 @@ class OrderService {
     private PaymentGateway paymentGateway;  // can be any implementation
 }
 ```
+
+---
+
+## 11. Association, Aggregation, Composition
+
+### Association
+
+Two classes have a relationship with each other. This is the broadest term.
+
+```java
+class Teacher {}
+class Student {}
+```
+
+A teacher teaches a student — that's an association. It can exist through fields, method parameters, return values, or other interactions.
+
+### Types of Association
+
+| Type | Example | Code |
+|---|---|---|
+| One-to-One | Person has one Passport | `class Person { Passport passport; }` |
+| One-to-Many | Customer has many Orders | `class Customer { List<Order> orders; }` |
+| Many-to-One | Each Order belongs to one Customer | `class Order { Customer customer; }` |
+| Many-to-Many | Students and Courses | `class Student { List<Course> courses; }` `class Course { List<Student> students; }` |
+
+### Association Direction
+
+- **Unidirectional**: A knows about B, but B doesn't know about A
+- **Bidirectional**: Both A and B know about each other
+
+```java
+// Bidirectional
+class Customer { List<Order> orders; }
+class Order { Customer customer; }
+
+// Unidirectional
+class Order { Customer customer; }
+class Customer { }  // doesn't know about orders
+```
+
+Association does not imply ownership. A Doctor is associated with Patients, but Patients exist independently.
+
+### Aggregation (Weak "Whole-Part")
+
+One object represents a whole that contains or group other objects, but those can exist independently of the whole:
+
+```java
+class Team {
+    private List<Player> players;  // players supplied from outside
+}
+```
+
+If the Team is deleted, the Players still exist. They can join another team. The Team doesn't create the Players.
+
+UML: `Team ◇──── Player` (hollow diamond on the whole side)
+
+### Composition (Strong "Whole-Part")
+
+The part's lifecycle belongs to the whole. The whole creates and destroys the parts:
+
+```java
+class House {
+    private List<Room> rooms;
+
+    House() {
+        this.rooms = new ArrayList<>();
+        rooms.add(new Room("Kitchen"));  // House creates the Rooms
+    }
+}
+```
+
+If the House is destroyed, the Rooms go with it. They don't exist independently.
+
+UML: `House ◆──── Room` (filled diamond on the whole side)
+
+### Decision Flowchart
+
+```
+Are A and B related?
+        │
+       Yes
+        ↓
+   Association
+        │
+        ↓
+Is B a part of A?
+    │          │
+   No         Yes
+    │          │
+    ↓          ↓
+Association  Can B exist independently?
+                 │
+             ┌───┴───┐
+            Yes      No
+             │        │
+             ↓        ↓
+        Aggregation Composition
+```
