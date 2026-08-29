@@ -1496,3 +1496,69 @@ High-level modules should not depend directly on low-level modules. Both should 
 Bad:    OrderService → StripePaymentService (concrete)
 Good:   OrderService → PaymentGateway (abstraction) ← StripePaymentService
 ```
+
+---
+
+## 15. Design Principles: DRY, KISS, YAGNI, Separation of Concerns
+
+### DRY — Don't Repeat Yourself
+
+Every piece of knowledge should have a single, unambiguous representation. If you see the same logic in two places, extract it into one place.
+
+### KISS — Keep It Simple, Stupid
+
+Prefer the simplest solution that works. Complexity should be justified, not accidental.
+
+### YAGNI — You Aren't Gonna Need It
+
+Don't build functionality until you actually need it. Adding features "just in case" adds complexity, maintenance burden, and potential bugs.
+
+### Separation of Concerns
+
+Different concerns should be separated so each part of the system focuses on a distinct responsibility.
+
+| Concern | Example |
+|---|---|
+| Presentation | HTML, CSS, UI logic |
+| Business logic | Rules, calculations, workflows |
+| Persistence | Database access, file I/O |
+| Communication | HTTP, messaging |
+
+### Dependency Inversion (as a design principle)
+
+Ask: Can the high-level code depend on a stable abstraction instead of a concrete implementation? If yes, prefer the abstraction.
+
+---
+
+## Quick Reference: When to Use What
+
+| Concept | When / Where to Use |
+|---|---|
+| Classes & Objects | Representing entities, services, data structures |
+| Constructors | Initializing objects into valid states |
+| Encapsulation | Protecting object invariants, hiding implementation |
+| Inheritance | Genuine IS-A relationships, shared behavior across related types |
+| Polymorphism | Writing code that works with multiple types through a common interface |
+| Abstraction | Simplifying complex systems, protecting callers from change |
+| Interfaces | Defining contracts, enabling multiple inheritance, loose coupling |
+| Abstract Classes | Sharing partial implementation among closely related classes |
+| Composition | Building complex objects from simpler parts, loose coupling |
+| SOLID | Guiding class and module design for maintainability |
+| DRY / KISS / YAGNI | Keeping code clean and practical |
+
+---
+
+## Practical Checklist
+
+- Prefer composition over inheritance when both could work.
+- Always use `@Override` when overriding methods.
+- Keep fields `private` and expose behavior through methods.
+- Depend on abstractions (interfaces), not concrete classes.
+- Each class should have one reason to change (SRP).
+- Don't build what you don't need yet (YAGNI).
+- Extract repeated logic into shared methods or classes (DRY).
+- Keep related behavior together (high cohesion).
+- Minimize dependencies between components (low coupling).
+- Use interfaces for contracts, abstract classes for shared base behavior.
+- Validate object state in constructors and setters to maintain invariants.
+- Use `instanceof` sparingly — polymorphism should handle most type-specific behavior.
