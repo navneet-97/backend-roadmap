@@ -742,37 +742,7 @@ String name = scanner.nextLine(); // skips input
 
 `nextInt()` reads only the integer token and leaves the newline (`\n`) in the buffer. Then `nextLine()` immediately consumes that leftover newline and returns an empty string.
 
-If the user enters:
-
-```text
-25⏎
-```
-
-`nextInt()` reads only `25` and leaves the newline (`\n`) behind.
-
-Then `nextLine()` immediately consumes that leftover newline and returns an empty string.
-
-## Why?
-
-Think of the input as:
-
-```text
-25\n
-```
-
-After `nextInt()`:
-
-```text
-25\n
-  ↑
-  newline is still here
-```
-
-Then `nextLine()` sees the newline immediately and returns:
-
-```text
-""
-```
+Think of the input as `25\n`. After `nextInt()`, the newline is still in the buffer. `nextLine()` sees it immediately and returns an empty string.
 
 **Fix:** Consume the leftover newline before reading the next line:
 
