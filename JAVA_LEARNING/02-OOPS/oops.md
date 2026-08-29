@@ -518,3 +518,165 @@ This is safe because Dog IS-A Animal. You often upcast because you care about ge
 - The child should satisfy the parent type
 - There is meaningful shared behavior/state
 - You want runtime polymorphism
+
+---
+
+## 6. Polymorphism
+
+**Polymorphism** means the same interface/reference can represent different concrete types, and the behavior depends on the actual object.
+
+### Why Do We Need It?
+
+Without polymorphism:
+
+```java
+class Dog { void makeSound() { System.out.println("Woof"); } }
+class Cat { void makeSound() { System.out.println("Meow"); } }
+
+Dog dog = new Dog();
+Cat cat = new Cat();
+dog.makeSound();  // must know it's a Dog
+cat.makeSound();  // must know it's a Cat
+```
+
+With polymorphism:
+
+```java
+class Animal {
+    void makeSound() {}
+}
+
+class Dog extends Animal {
+    @Override
+    void makeSound() { System.out.println("Woof"); }
+}
+
+class Cat extends Animal {
+    @Override
+    void makeSound() { System.out.println("Meow"); }
+}
+```
+
+```java
+Animal animal1 = new Dog();
+Animal animal2 = new Cat();
+```
+
+Common type: `Animal`. Actual objects: `Dog` and `Cat`.
+
+### Compile-Time Polymorphism (Method Overloading)
+
+Same method name, different parameter lists. The compiler determines which method to call:
+
+```java
+class Calculator {
+    int add(int a, int b) { return a + b; }
+    int add(int a, int b, int c) { return a + b + c; }
+    double add(double a, double b) { return a + b; }
+}
+```
+
+You **cannot** overload by changing only the return type.
+
+### Runtime Polymorphism (Method Overriding)
+
+```java
+Animal animal = new Dog();
+animal.makeSound();  // executes Dog's method
+```
+
+The actual implementation is determined at **runtime** based on the object type, not the reference type.
+
+### Dynamic Method Dispatch
+
+```java
+Animal animal;
+animal = new Dog();
+animal.makeSound();  // Dog's method
+
+animal = new Cat();
+animal.makeSound();  // Cat's method
+```
+
+The same `animal.makeSound()` produces different behavior depending on the actual object. This is the core of runtime polymorphism.
+
+### What the Compiler Sees vs What Runs
+
+```java
+class Animal {
+    void eat() {}
+}
+
+class Dog extends Animal {
+    void bark() {}
+}
+
+Animal animal = new Dog();
+animal.eat();    // works: eat() is defined in Animal
+// animal.bark(); // compile error: compiler looks at reference type (Animal)
+```
+
+The compiler uses the **reference type** to decide what methods are callable. The JVM uses the **actual object type** to decide which overridden method runs.
+
+### Upcasting and Downcasting
+
+**Upcasting** (safe, implicit):
+
+```java
+Dog dog = new Dog();
+Animal animal = dog;  // safe: Dog IS-A Animal
+```
+
+**Downcasting** (requires explicit cast, not safe):
+
+```java
+Animal animal = new Dog();
+Dog dog = (Dog) animal;   // works here
+dog.bark();
+
+Animal animal2 = new Cat();
+Dog dog2 = (Dog) animal2;  // compiles but ClassCastException at runtime!
+```
+
+### `instanceof`
+
+Check before downcasting:
+
+```java
+if (animal instanceof Dog dog) {
+    dog.bark();
+}
+```
+
+### Polymorphism with Collections
+
+```java
+List<Animal> animals = new ArrayList<>();
+animals.add(new Dog());
+animals.add(new Cat());
+animals.add(new Dog());
+
+for (Animal animal : animals) {
+    animal.makeSound();  // polymorphism works naturally
+}
+```
+
+The list doesn't need to know every concrete subtype.
+
+### Polymorphism Eliminates Type Checking
+
+Without polymorphism:
+
+```java
+if (animal instanceof Dog) {
+    ((Dog) animal).makeSound();
+} else if (animal instanceof Cat) {
+    ((Cat) animal).makeSound();
+}
+```
+
+With polymorphism:
+
+```java
+animal.makeSound();  // the object itself provides the right behavior
+```
