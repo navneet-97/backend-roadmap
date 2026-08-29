@@ -347,3 +347,174 @@ Price can never be negative. The object protects itself.
 | What | Don't allow direct access to internal details | Bundle state and behavior behind a controlled interface |
 | Scope | Narrower | Broader |
 | Example | `private BigDecimal balance;` | private fields + controlled operations + business rules + hidden implementation |
+
+---
+
+## 5. Inheritance
+
+**Inheritance** allows one class to acquire properties and behavior from another class.
+
+### Basic Example
+
+```java
+class Animal {
+    String name;
+
+    public Animal(String name) {
+        this.name = name;
+    }
+
+    public void eat() {
+        System.out.println("Eating");
+    }
+}
+```
+
+```java
+class Dog extends Animal {
+    public Dog(String name) {
+        super(name);
+    }
+
+    public void bark() {
+        System.out.println("Barking");
+    }
+}
+```
+
+```java
+Dog dog = new Dog("Rex");
+dog.eat();   // inherited from Animal
+dog.bark();  // defined in Dog
+```
+
+### IS-A vs HAS-A
+
+| | IS-A | HAS-A |
+|---|---|---|
+| Represents | Inheritance | Composition |
+| Example | Dog **IS-A** Animal | Car **HAS-A** Engine |
+| Code | `class Dog extends Animal` | `class Car { private Engine engine; }` |
+
+**When considering inheritance, ask**: Is the child genuinely a specialized form of the parent? Not "can I reuse some code from the parent." Use composition for code reuse.
+
+### `super()` — Calling the Parent Constructor
+
+```java
+class Dog extends Animal {
+    public Dog(String name) {
+        super(name);  // parent constructor runs first
+    }
+}
+```
+
+**First parent state is initialized, then child state.** `super()` should always be the first statement.
+
+Why must the parent constructor execute? Because the child is also an instance of the parent type. The parent portion of the object needs initialization too.
+
+**If the child constructor doesn't explicitly call `super(...)`, Java implicitly inserts `super()`.** But this only works if the parent has an accessible no-argument constructor.
+
+```java
+class Animal {
+    Animal(String name) {}  // no no-argument constructor
+}
+
+class Dog extends Animal {
+    Dog() {}  // won't compile! Java tries super() but Animal() doesn't exist
+}
+```
+
+You must explicitly call `super(name)`.
+
+### Accessing Parent Members with `super`
+
+```java
+class Dog extends Animal {
+    @Override
+    public void eat() {
+        super.eat();  // call the parent implementation
+        System.out.println("Dog eating");
+    }
+}
+```
+
+### Method Overriding
+
+A child provides its own implementation of an inherited method:
+
+```java
+class Animal {
+    public void makeSound() {
+        System.out.println("Some sound");
+    }
+}
+
+class Dog extends Animal {
+    @Override
+    public void makeSound() {
+        System.out.println("Woof");
+    }
+}
+```
+
+**Rules for overriding:**
+- The child method must have a compatible return type
+- The child method cannot be more restrictive in access
+- Use `@Override` to let the compiler verify you're actually overriding
+
+**What can't be overridden:**
+- `final` methods (inherited, not another implementation)
+- `private` methods (not inherited, not accessible out of class)
+- `static` methods (they're hidden, not overridden)
+- Constructors (not inherited)
+
+### Inheritance Levels
+
+Java supports **multilevel inheritance**:
+
+```
+Animal
+   ↑
+ Mammal
+   ↑
+  Dog
+```
+
+Every class ultimately extends `Object`. If you write `class Dog {}`, Java treats it as `class Dog extends Object {}`. That's why every object has `toString()`, `equals()`, etc.
+
+### Multiple Inheritance — Not Supported for Classes
+
+This is invalid:
+
+```java
+class Dog extends Animal, Pet {}  // compile error
+```
+
+Java supports only single class inheritance. **Reason: the Diamond Problem.** If two parent classes have the same method, the child doesn't know which one to call.
+
+```java
+class A { public void show() {} }
+class B { public void show() {} }
+class C extends A, B {}
+// C obj = new C(); obj.show();  // Which show()?
+```
+
+Java uses **interfaces** for multiple inheritance instead.
+
+### Upcasting
+
+```java
+class Dog extends Animal {}
+
+Dog dog = new Dog();
+Animal animal = dog;  // upcasting: child → parent reference
+```
+
+This is safe because Dog IS-A Animal. You often upcast because you care about general behavior, not the specific implementation.
+
+### When to Use Inheritance
+
+- There is a genuine specialization relationship
+- The child should satisfy the parent type
+- There is meaningful shared behavior/state
+- You want runtime polymorphism
