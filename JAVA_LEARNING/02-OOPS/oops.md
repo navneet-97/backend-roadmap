@@ -1219,3 +1219,118 @@ Association  Can B exist independently?
              ↓        ↓
         Aggregation Composition
 ```
+
+---
+
+## 12. Coupling
+
+**Coupling** is the degree of dependency between software components. How much does one class depend on another?
+
+### Tight Coupling
+
+```java
+class OrderService {
+    private StripePaymentService paymentService;
+
+    OrderService() {
+        this.paymentService = new StripePaymentService();  // directly creates
+    }
+
+    void placeOrder() {
+        paymentService.pay();
+    }
+}
+```
+
+`OrderService` is tied directly to `StripePaymentService`. Changing to Razorpay means modifying `OrderService` — and if this dependency exists in 20 classes, changes become expensive.
+
+### Loose Coupling
+
+```java
+interface PaymentService {
+    void pay();
+}
+
+class StripePaymentService implements PaymentService {
+    @Override
+    public void pay() { /* Stripe payment */ }
+}
+
+class RazorpayPaymentService implements PaymentService {
+    @Override
+    public void pay() { /* Razorpay payment */ }
+}
+```
+
+```java
+class OrderService {
+    private final PaymentService paymentService;
+
+    OrderService(PaymentService paymentService) {
+        this.paymentService = paymentService;  // depends on abstraction
+    }
+
+    void placeOrder() {
+        paymentService.pay();
+    }
+}
+```
+
+### Tight vs Loose Coupling Summary
+
+| | Tight Coupling | Loose Coupling |
+|---|---|---|
+| Knowledge | A knows many details about B | A knows very little about B |
+| Creation | A creates B directly | A receives B from outside |
+| Dependency | A depends on B's implementation | A depends on an abstraction |
+| Impact | Changes in B easily break A | B can change without affecting A |
+
+### Types of Coupling
+
+| Type | Example | Problem |
+|---|---|---|
+| **Inheritance** | Child depends on parent's internal structure | Parent changes break child |
+| **Parameter** | `process(StripePaymentRequest request)` | Tied to specific type |
+| **Return type** | `MySQLUser findUser(Long id)` | Callers depend on implementation |
+| **Static state** | `GlobalConfig.paymentMode = "STRIPE"` | Hidden global dependencies |
+| **Global variable** | Multiple classes read/write same global | Indirect connection |
+| **Temporal** | `initialize()` must be called before `process()` | Caller must know correct order |
+| **Content** | One component accesses another's internals | Very tight |
+| **Common** | Multiple components share global state | Changes affect all |
+| **Control** | `process(order, true)` — what does `true` mean? | One component controls another |
+| **Data** | `calculateTotal(order)` — passes only needed data | Healthiest form |
+
+### Coupling and Encapsulation
+
+Encapsulation reduces coupling. If `balance` is public, callers are coupled to the internal representation. If `balance` is private with a `withdraw()` method, callers depend only on the behavior, not the storage.
+
+### Coupling and Abstraction
+
+```
+Instead of:  OrderService → StripePaymentService
+Have:        OrderService → PaymentGateway → StripePaymentService
+```
+
+The abstraction hides implementation details and reduces coupling.
+
+### Coupling and Dependency Injection
+
+Instead of creating dependencies internally, supply them from outside:
+
+```java
+// Tight:
+class OrderService {
+    private PaymentGateway gateway = new StripePaymentGateway();
+}
+
+// Loose (dependency injection):
+class OrderService {
+    private final PaymentGateway gateway;
+
+    OrderService(PaymentGateway gateway) {
+        this.gateway = gateway;
+    }
+}
+```
+
+Spring Boot uses this idea heavily.
