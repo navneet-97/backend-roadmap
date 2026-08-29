@@ -1384,3 +1384,115 @@ Both methods are strongly related to password hashing. High functional cohesion.
 ### The Goal
 
 **High cohesion + low coupling** = easier to maintain, test, and extend.
+
+---
+
+## 14. SOLID Principles
+
+SOLID is five object-oriented design principles that help you write code that is easier to change, maintain, extend, test, and understand.
+
+### S — Single Responsibility Principle
+
+A class should have **one responsibility** and **one reason to change**.
+
+```java
+// Bad: one class does everything
+class UserService {
+    void createUser() {}
+    void sendEmail() {}
+    void generateReport() {}
+}
+
+// Good: each class has one job
+class UserService { void createUser() {} }
+class EmailService { void sendEmail() {} }
+class ReportService { void generateReport() {} }
+```
+
+### O — Open/Closed Principle
+
+Software entities should be **open for extension** but **closed for modification**.
+
+**Bad** — adding a new payment type means modifying `PaymentService`:
+
+```java
+class PaymentService {
+    void pay(String type) {
+        if (type.equals("CARD")) { /* card payment */ }
+        else if (type.equals("UPI")) { /* UPI payment */ }
+        else if (type.equals("PAYPAL")) { /* PayPal payment */ }
+    }
+}
+```
+
+**Good** — use polymorphism to extend without modifying:
+
+```java
+interface PaymentMethod {
+    void pay();
+}
+
+class CardPayment implements PaymentMethod {
+    public void pay() { /* card payment */ }
+}
+
+class UpiPayment implements PaymentMethod {
+    public void pay() { /* UPI payment */ }
+}
+
+class PaymentService {
+    void processPayment(PaymentMethod paymentMethod) {
+        paymentMethod.pay();
+    }
+}
+```
+
+Adding `WalletPayment` doesn't require changing `PaymentService`.
+
+### L — Liskov Substitution Principle
+
+Objects of a subclass should be usable wherever objects of the parent type are expected, without breaking correctness.
+
+If `Dog extends Animal`, then anywhere you use an `Animal`, a `Dog` should work correctly without surprising behavior.
+
+### I — Interface Segregation Principle
+
+Clients should not be forced to depend on methods they do not use.
+
+**Bad:**
+
+```java
+interface Worker {
+    void work();
+    void eat();
+    void sleep();
+}
+
+class Robot implements Worker {
+    public void work() { }
+    public void eat() { throw new UnsupportedOperationException(); }  // forced!
+    public void sleep() { throw new UnsupportedOperationException(); }  // forced!
+}
+```
+
+**Good — split the interface:**
+
+```java
+interface Workable { void work(); }
+interface Eatable { void eat(); }
+interface Sleepable { void sleep(); }
+
+class Human implements Workable, Eatable, Sleepable { }
+class Robot implements Workable { }
+```
+
+Each class depends only on what it actually needs.
+
+### D — Dependency Inversion Principle
+
+High-level modules should not depend directly on low-level modules. Both should depend on abstractions.
+
+```
+Bad:    OrderService → StripePaymentService (concrete)
+Good:   OrderService → PaymentGateway (abstraction) ← StripePaymentService
+```
