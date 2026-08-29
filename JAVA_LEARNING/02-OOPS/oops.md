@@ -730,3 +730,216 @@ The caller still does `paymentService.processPayment(order)`. The caller doesn't
 
 Abstraction is not simply hiding code. Good abstraction means the exposed operation represents a **meaningful concept**. The caller thinks about **WHAT** they want, not **HOW** it is implemented.
 Abstraction is all about exposing the right level of detail.
+
+---
+
+## 8. Interfaces
+
+An **interface** defines a contract or capability that a class agrees to provide.
+
+### Why Do Interfaces Exist?
+
+```java
+class Dog { void makeSound() {} }
+class Cat { void makeSound() {} }
+```
+
+Both can make a sound, but there's no common contract saying "anything that can be treated as an animal must provide `makeSound()`."
+
+```java
+interface Animal {
+    void makeSound();
+}
+
+class Dog implements Animal {
+    @Override
+    public void makeSound() {
+        System.out.println("Woof");
+    }
+}
+
+class Cat implements Animal {
+    @Override
+    public void makeSound() {
+        System.out.println("Meow");
+    }
+}
+```
+
+**Syntax rules:**
+- `class extends class`
+- `class implements interface`
+- `interface extends interface`
+
+An interface cannot be instantiated: `new Animal()` is invalid. Because an interface doesn't provide a concrete implementation for its abstract behavior.
+
+### Interface Methods
+
+Interface methods are implicitly `public abstract`:
+
+```java
+interface Animal {
+    void eat();  // effectively: public abstract void eat();
+}
+```
+
+When implementing, you cannot reduce visibility — it must be `public`.
+
+### Interface Fields
+
+Interface fields are implicitly `public static final`:
+
+```java
+interface Config {
+    int MAX_RETRIES = 3;  // public static final int MAX_RETRIES = 3;
+}
+```
+
+Interfaces don't have instance state. They define behavior/contracts, not per-object data. So interface fields are constants.
+
+### Multiple Inheritance via Interfaces
+
+Java classes can implement multiple interfaces:
+
+```java
+interface Animal { void makeSound(); }
+interface Pet { void play(); }
+
+class Dog implements Animal, Pet {
+    @Override
+    public void makeSound() { System.out.println("Woof"); }
+
+    @Override
+    public void play() { System.out.println("Playing"); }
+}
+```
+
+Why is this allowed? Because interfaces represent contracts/capabilities. When two interfaces have the same method, the implementing class provides one implementation — no ambiguity.
+
+### Interfaces Can Extend Interfaces
+
+```java
+interface Animal { void makeSound(); }
+
+interface Mammal extends Animal { void eat(); }
+
+class Dog implements Mammal {
+    @Override
+    public void eat() { }
+
+    @Override
+    public void makeSound() { }
+}
+```
+
+### Default Methods
+
+Introduced for **interface evolution** — adding new methods to existing interfaces without breaking all implementations:
+
+```java
+interface Animal {
+    void makeSound();
+
+    default void sleep() {
+        System.out.println("Sleeping");
+    }
+}
+
+class Dog implements Animal {
+    @Override
+    public void makeSound() { }
+
+    // sleep() is optional — default implementation exists
+}
+```
+
+Default methods can be overridden:
+
+```java
+class Dog implements Animal {
+    @Override
+    public void makeSound() { }
+
+    @Override
+    public void sleep() {
+        System.out.println("Dog sleeping");
+    }
+}
+```
+
+### Static Methods in Interfaces
+
+```java
+interface Animal {
+    static int maxAge() {
+        return 100;
+    }
+}
+```
+
+Called through the interface: `Animal.maxAge()`. Belongs to the interface, not implementing objects.
+
+### Private Methods in Interfaces
+
+```java
+interface NotificationSender {
+    default void sendNotification() {
+        validate();
+        // sending logic
+    }
+
+    private void validate() {
+        // shared internal logic for default methods only
+    }
+}
+```
+
+Private methods exist to support default methods. Implementing classes cannot call them.
+
+### An Interface Cannot Have a Constructor
+
+Because interfaces can't be instantiated. They don't represent concrete objects that need initialization.
+
+### Interface Doesn't Guarantee Good Behavior
+
+```java
+interface PaymentGateway { void charge(); }
+
+class BadGateway implements PaymentGateway {
+    @Override
+    public void charge() {
+        // does nothing
+    }
+}
+```
+
+Java only checks the method signature exists. It doesn't enforce semantic correctness.
+
+### Interface vs Inheritance:
+**Class Inheritance**:
+```java
+class Dog extends Animal
+```
+represents `Dog` is a specialized `Animal`.
+
+**Interface Implementation:**
+```java
+class StripeGateway implements PaymentGateway
+```
+represents `StripeGateway` statisfies the `PaymentGateway` contract.
+
+
+### Functional Interface
+
+An interface with exactly one abstract method. Can be used with lambdas:
+
+```java
+@FunctionalInterface
+interface Calculator {
+    int add(int a, int b);
+}
+```
+
+```java
+Calculator add = (a, b) -> a + b;
+```
