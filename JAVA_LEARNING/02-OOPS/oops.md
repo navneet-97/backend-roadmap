@@ -274,3 +274,76 @@ public class User {
 ```
 
 Nobody outside the class can create objects. Used in utility classes to prevent meaningless instances, and in design patterns like Singleton and Factory.
+
+---
+
+## 4. Encapsulation
+
+**Encapsulation** means an object should control how its state can be changed.
+Or
+Encapsulation means controlling access to an object's state and protecting the rules that govern that state.
+
+### The Problem Without Encapsulation
+
+```java
+public class BankAccount {
+    int balance;
+}
+```
+
+Anyone can do:
+
+```java
+account.balance = -500000;
+```
+
+Your object is now invalid. The class has no control over itself.
+
+### The Solution
+
+```java
+public class BankAccount {
+    private int balance;
+
+    public int getBalance() {
+        return this.balance;
+    }
+
+    public void withdraw(int amount) {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Invalid amount");
+        }
+        if (balance < amount) {
+            throw new IllegalArgumentException("Insufficient balance");
+        }
+        this.balance -= amount;
+    }
+}
+```
+
+The object now protects its own state. Callers must go through controlled methods.
+
+### Encapsulation Also Hides Implementation Details
+
+The caller doesn't need to know *how* you get the balance. You could have a `balance` field, or calculate it from a list of transactions. The interface stays the same.
+
+### Encapsulation Maintains Invariants
+
+```java
+public void changePrice(BigDecimal price) {
+    if (price == null || price.signum() <= 0) {
+        throw new IllegalArgumentException("Price must be greater than zero");
+    }
+    this.price = price;
+}
+```
+
+Price can never be negative. The object protects itself.
+
+### Encapsulation vs Data Hiding
+
+| | Data Hiding | Encapsulation |
+|---|---|---|
+| What | Don't allow direct access to internal details | Bundle state and behavior behind a controlled interface |
+| Scope | Narrower | Broader |
+| Example | `private BigDecimal balance;` | private fields + controlled operations + business rules + hidden implementation |
