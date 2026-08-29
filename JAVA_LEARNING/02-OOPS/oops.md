@@ -680,3 +680,53 @@ With polymorphism:
 ```java
 animal.makeSound();  // the object itself provides the right behavior
 ```
+
+---
+
+## 7. Abstraction
+
+**Abstraction** means exposing the essential parts of something while hiding the implementation details. It answers: *what should the outside world need to know?*
+
+### Why Do We Need Abstraction?
+
+Without abstraction, every time you save a user you'd write:
+
+```java
+Connection connection = DriverManager.getConnection(...);
+PreparedStatement statement = connection.prepareStatement(...);
+statement.setString(...);
+statement.executeUpdate();
+connection.close();
+```
+
+With abstraction:
+
+```java
+userRepository.save(user);
+```
+
+### Abstraction at Different Levels
+
+| Level | Example | What's Hidden |
+|---|---|---|
+| Method | `sendEmail(user)` | Email sending implementation |
+| Class | `paymentService.processPayment()` | Internal payment workflow |
+| Library | `List<String> names = new ArrayList<>()` | How ArrayList manages its internal array |
+| Framework | `repository.save(user)` | SQL generation and database interaction |
+| API | `POST /orders` | Validate → check availability → create → calculate → save → notify |
+
+### Abstraction and Change
+
+One of the biggest benefits of abstraction is protecting users from implementation changes:
+
+```
+Today:  PaymentService → Stripe
+Tomorrow: PaymentService → Razorpay
+```
+
+The caller still does `paymentService.processPayment(order)`. The caller doesn't change because the implementation behind the abstraction changed.
+
+### Key Insight
+
+Abstraction is not simply hiding code. Good abstraction means the exposed operation represents a **meaningful concept**. The caller thinks about **WHAT** they want, not **HOW** it is implemented.
+Abstraction is all about exposing the right level of detail.
